@@ -31,7 +31,7 @@ You go to a university and you can log into any computer on campus with the same
 - Step 3
 - Step 4
 
-<h2>Installation Steps</h2>
+<h2>Configuration Steps</h2>
 
 ### 1. Create Resource Group and Virtual Network
 <p>
@@ -130,135 +130,136 @@ Verify the DNS Servers is the correct IP Address for DNS Servers "dc-1".
 </p>
 <br />
 
-### 4. Install Prerequisite Programs
+<h2>Deployment Steps</h2>
+
+### 4. Install Active Directory
 <p>
-<img src="https://github.com/user-attachments/assets/c5f6d44b-c41b-433b-9b5c-a3ef4554c41d" height="90%" width="90%" alt="Install Programs"/>
+<img src="https://github.com/user-attachments/assets/ee8dc31c-0585-49c7-8c35-abc84f4e53c8" height="60%" width="60%" alt="Install Programs"/>
 </p>
 <p>
-Install PHP Manager for IIS.
-  
-Install Rewrite Module.
+Go to dc-1 and enter Server Manager ---> Add Rolls and Features ---> Click Next to Server Roles and Enable Active Directory Domain Services. ---> Install.
 
-Extract and move the "php-7.3.8-nts-Win32-VC15-x86.zip" file to C:\PHP.
+Go to Server Manager and Promote Server as Domain Controller ---> Add a new forest "mydomain.com" ---> Configure Password. ---> Install.
 
-Install VC_redist.x86.exe.
-
-Install MySQL 5.5.62.
+Restart the Domain Controller "dc-1" and login again using mydomain.com\labuser.
 </p>
 <br />
 
-### 5. Configure MySQL Server
+### 5. Create a Domain Admin User Within the Domain
 <p>
-<img src="https://github.com/user-attachments/assets/b4e62953-c03c-42f9-93a8-9cf45806a780" height="80%" width="80%" alt="Configuring MySQL"/>
+<img src="https://github.com/user-attachments/assets/44bf5b74-f26a-4baa-9c56-c92f061d0faa" height="60%" width="60%" alt="Organizational Units"/>
 </p>
 <p>
-Run the MySQL installer and follow the default setup process.
-  
-Launch the Configuration Wizard and select Standard Configuration.
+Login to the domain controller and navigate to Active Directory Users and Computers. 
 
-Create a root username and password (both set to "root" for this setup).
-</p>
-<br />
+Create an organizational unit called "_EMPLOYEES" and "_ADMINS".
 
-### 6. Configure PHP in IIS
-<p>
-<img src="https://github.com/user-attachments/assets/5287aa0c-bc96-44be-8ba1-2dd576f20266" height="80%" width="80%" alt="Register PHP Version on IIS Manager"/>
-</p>
-<p>
-Open IIS Manager → PHP Manager.
-  
-Click Register new PHP version and navigate to C:\PHP\php-cgi.exe.
-
-Restart IIS using the left-side menu in IIS Manager.
-</p>
-<br />
-
-### 7. Install osTicket
-<p>
-<img src="https://github.com/user-attachments/assets/5401ec68-6d70-4b68-b9ab-276bf25cb98b" height="80%" width="80%" alt="Installation Steps"/>
-</p>
-<p>
-Extract osTicket-v1.15.8.zip and copy the upload folder to C:\inetpub\wwwroot.
-  
-Rename the upload folder to osTicket.
-
-Restart IIS.
-</p>
-<br />
-
-### 8. Configure IIS for osTicket
-<p>
-<img src="https://github.com/user-attachments/assets/723822ba-1131-45b9-a821-794467a77d7c" height="80%" width="80%" alt="Installation Steps"/>
-</p>
-<p>
-In IIS Manager, navigate to Sites → Default Web Site → osTicket.
-  
-Click *Browse :80 (http) to verify the installation.
+Navigate to mydomain.com ---> Right Click Add Users ---> Create the units. 
 </p>
 <br />
 
 <p>
-<img src="https://github.com/user-attachments/assets/0bfba6da-35f7-47d0-9ea4-a5cf1b416740" height="80%" width="80%" alt="os-ticket-extensions"/>
+<img src="https://github.com/user-attachments/assets/ab8d0246-aae9-4120-9ceb-208df7542689" height="60%" width="60%" alt="Create Domain User"/>
 </p>
 <p>
-In IIS Manager, navigate to Sites → Default Web Site → osTicket.
-  
-Click on PHP Manager ---> PHP Extensions (Enable and Disable Extensions). 
+Create a new user "Jane Doe" with the username "jane_admin".
 
-Enable PHP extensions:
+Right Click on the _ADMINS folder in the Active Directroy Users and Computers. 
 
-- php_imap.dll
-  
-- php_intl.dll
-  
-- php_opcache.dll
+Create the user and configure a password for the user.
+
+Click on the user and add property where they are apart of Domain Admins.
+
+Log out and close dc-1 connection and login with mydomain.com\jane_admin. 
 </p>
 <br />
 
-### 9. Rename and Assign Permissions
+### 6. Join Client-1 Into the Domain Controller
 <p>
-<img src="https://github.com/user-attachments/assets/ed86df0b-a033-40c4-8b8c-bac4a6dd50fa" height="80%" width="80%" alt="os-ticket-extensions"/>
+<img src="https://github.com/user-attachments/assets/a3639515-7f99-4ced-bb63-d1d841332cf8" height="60%" width="60%" alt="Register PHP Version on IIS Manager"/>
 </p>
 <p>
-Go to C:\inetpub\wwwroot\osTicket\include.
-  
-Rename "ost-sampleconfig.php" to "ost-config.php".
-</p>
-<br />
+Login to Client-1 as the original local admin (labuser) and join it to the domain controller.
 
-<p>
-<img src="https://github.com/user-attachments/assets/7b161c16-e311-4897-b85e-95996a0b1327" height="80%" width="80%" alt="os-ticket-extensions"/>
-</p>
-<p>
-Right-click ost-config.php → Properties → Security → Advanced.
-  
-Disable inheritance and grant Full Control to Everyone.
-</p>
-<br />
+Go to Start Menu and Settings ---> Rename this PC ---> Change Domian to Member of mydomain.com ---> Login with jane_admin. 
 
-### 10. Set Up the Database
-
-<p>
-<img src="https://github.com/user-attachments/assets/315aaaac-0ded-4a3d-854c-815dd3bdfa18" height="80%" width="80%" alt="Setup HeidiSQL"/>
-</p>
-<p>
-Install HeidiSQL from the "osTicket-Installation-Files" folder. 
-  
-Create a new session using the MySQL root username and password. 
-
-Connect to the IIS session and create a database named osTicket.
+Restart Client-1. 
 </p>
 <br />
 
 <p>
-<img src="https://github.com/user-attachments/assets/d01f7721-6701-4507-9cb8-7f386229a6b3" height="80%" width="80%" alt="Configure MySQL"/>
+<img src="https://github.com/user-attachments/assets/c3c9f9d5-27bb-4ca5-9c6c-36b1527dcb25" height="60%" width="60%" alt="Domain Client Check"/>
 </p>
 <p>
-Return to the osTicket installer in your browser.
-  
-Enter the required details (Helpdesk Name, Default Email, Admin Username, Password, and osTicket database settings).
+Go back to the domain controller (dc-1) and navigate to the start menu and then AD Users and Computers. 
 
-Click Install Now to complete the setup.
+Verify that client-1 is now under mydomain.com in computers folder. 
+
+Create a new organizational unit and call it _CLIENTS. Then drag client-1 in computers folder to _CLIENTS folder. 
+</p>
+<br />
+
+<h2>Creating Users using Powershell</h2>
+
+### 7. Enable Remote Access to Domain Controller from Client-1
+<p>
+<img src="https://github.com/user-attachments/assets/629197ca-429a-4a70-b3ea-e9312c938186" height="60%" width="60%" alt="Installation Steps"/>
+</p>
+<p>
+Login to Client-1 as mydomain.com\jane_admin
+
+Open System Properties and Click Remote Desktop ---> Select user that can remotely access this PC ---> From this location: mydomain.com, Field: Domain Users.
+</p>
+<br />
+
+### 8. Create a Bunch of Additional Users and Attempt to Log into Client-1 with one of the Users
+<p>
+<img src="https://github.com/user-attachments/assets/a729dc27-6d29-41cb-9f43-3e68efb38c90" height="60%" width="60%" alt=""/>
+</p>
+<p>
+Log into the Domain Controller (dc-1) as jane_admin.
+
+Open Powershell_ise as an administrator. 
+
+Create a new file and paste the contents of the [script](https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1) into it. 
+
+Run the script and observe the accounts being created. 
+</p>
+<br />
+
+<h2>Group Policy and Managing Accounts</h2>
+
+### 9. Dealing with Account Lockouts
+<p>
+<img src="" height="60%" width="60%" alt=""/>
+</p>
+<p>
+</p>
+<br />
+
+<p>
+<img src="" height="60%" width="60%" alt=""/>
+</p>
+<p>
+
+</p>
+<br />
+
+### 10. Enabling and Disabling Accounts
+
+<p>
+<img src="" height="60%" width="60%" alt=""/>
+</p>
+<p>
+
+</p>
+<br />
+
+<p>
+<img src="" height="60%" width="60%" alt=""/>
+</p>
+<p>
+
 </p>
 <br />
 
